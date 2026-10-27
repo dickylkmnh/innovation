@@ -1,0 +1,755 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lab Virtual Penjernihan Air</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: meja lab — jendela ilustrasi di kiri (lengket saat menggulir), lembar kerja di kanan; bertumpuk di HP */
+:root{
+  --bg:#edf2f0; --surface:#ffffff; --surface-2:#f4f8f6; --ink:#0f2d2a; --ink-2:#4a625e; --ink-3:#7a8d89; --line:#d3dfdb;
+  --accent:#0d7a70; --accent-ink:#ffffff; --accent-soft:#d6eeea;
+  --silt:#9a6a28; --silt-soft:#f4e8d4;
+  --ok:#23774a; --ok-soft:#ddf1e4; --warn:#b5561a; --warn-soft:#fbe8d8; --bad:#b8322b; --bad-soft:#f8dedb;
+  --shadow:0 1px 2px rgba(15,45,42,.06),0 10px 28px -14px rgba(15,45,42,.22);
+  --f-display:"Bricolage Grotesque","Plus Jakarta Sans",system-ui,sans-serif;
+  --f-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1715; --surface:#12211e; --surface-2:#172925; --ink:#e2eeeb; --ink-2:#a6bab5; --ink-3:#7a8e89; --line:#25403b;
+    --accent:#3dbfb0; --accent-ink:#05221e; --accent-soft:#133a35;
+    --silt:#dba95c; --silt-soft:#3a2c17;
+    --ok:#5dc98b; --ok-soft:#163726; --warn:#f0a062; --warn-soft:#3d2614; --bad:#f17d73; --bad-soft:#3f1a17;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.65);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1715; --surface:#12211e; --surface-2:#172925; --ink:#e2eeeb; --ink-2:#a6bab5; --ink-3:#7a8e89; --line:#25403b;
+  --accent:#3dbfb0; --accent-ink:#05221e; --accent-soft:#133a35;
+  --silt:#dba95c; --silt-soft:#3a2c17;
+  --ok:#5dc98b; --ok-soft:#163726; --warn:#f0a062; --warn-soft:#3d2614; --bad:#f17d73; --bad-soft:#3f1a17;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 30px -14px rgba(0,0,0,.65);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1220px;margin:0 auto;padding-inline:20px;padding-block:22px 56px;display:grid;gap:18px}
+@media (max-width:480px){.wrap{padding-inline:16px}}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
+p{margin:0}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+.top>div{min-width:0;flex:1 1 420px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+h1{font-weight:800;font-size:clamp(26px,4.2vw,42px);line-height:1.04;letter-spacing:-.025em}
+.lede{margin-top:8px;color:var(--ink-2);max-width:62ch}
+.namefield{display:grid;gap:5px;flex:0 1 270px;min-width:0}
+.namefield span{font-size:12px;font-weight:700;color:var(--ink-2);letter-spacing:.06em;text-transform:uppercase}
+input,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+textarea{resize:vertical;min-height:84px;line-height:1.5}
+input:focus-visible,textarea:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* case tabs */
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.case-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;min-width:0}
+.case-btn:hover:not(:disabled){border-color:var(--accent)}
+.case-btn.is-cur{border-color:var(--accent);background:var(--accent-soft)}
+.case-btn:disabled{cursor:not-allowed;opacity:.6}
+.swatch{flex:none;width:24px;height:30px;border:2px solid var(--ink-3);border-top:none;border-radius:0 0 7px 7px;position:relative;overflow:hidden}
+.swatch i{position:absolute;inset:auto 0 0 0;height:72%}
+.case-txt{display:grid;min-width:0}
+.case-txt b{font-weight:700;font-size:14px}
+.case-txt small{color:var(--ink-2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.done-mark{margin-left:auto;flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok);color:var(--surface);display:grid;place-items:center}
+@media (max-width:560px){.case-btn{flex-direction:column;align-items:flex-start;gap:6px;padding:10px}.done-mark{position:absolute;margin:0}.case-btn{position:relative}.done-mark{top:8px;right:8px}.case-txt small{white-space:normal}}
+
+/* progress */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.steps li{display:grid;gap:6px;font-size:13px;color:var(--ink-3);min-width:0}
+.steps li::before{content:"";height:5px;border-radius:99px;background:var(--line)}
+.steps li span{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.steps li b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps li.done{color:var(--ok)} .steps li.done::before{background:var(--ok)}
+.steps li.active{color:var(--ink)} .steps li.active::before{background:var(--accent)}
+
+/* main */
+.lab{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:20px;align-items:start}
+.viewer{display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);min-width:0}
+@media (max-width:900px){.lab{grid-template-columns:minmax(0,1fr)}.viewer{position:static}}
+.frame{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#dfe9ec;box-shadow:var(--shadow)}
+canvas{display:block;width:100%;height:auto;aspect-ratio:640/440;max-width:100%}
+.caption{background:var(--surface);border:1.5px solid var(--accent);color:var(--ink);border-radius:12px;padding:10px 14px 12px;font-size:14px;line-height:1.45;display:grid;gap:6px;font-weight:600}
+.caption .bar{height:4px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:2px}
+.caption .bar i{display:block;height:100%;width:0;background:var(--accent)}
+.caption .tag{font-family:var(--f-mono);font-size:11px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.controls{display:flex;flex-wrap:wrap;gap:8px}
+.obs{display:grid;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--ink)}
+.obs span{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--silt)}
+
+/* buttons */
+.btn{font:inherit;font-weight:600;font-size:14px;padding:9px 15px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover:not(:disabled){filter:brightness(1.07)}
+.btn-big{font-size:16px;padding:13px 22px;border-radius:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-danger{border-color:var(--bad);color:var(--bad)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* sheet */
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:6px 22px 8px;min-width:0}
+@media (max-width:480px){.sheet{padding:4px 16px 6px}}
+.case-head{padding-block:18px 16px;display:grid;gap:6px}
+.kicker{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.case-head h2{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.case-head p{color:var(--ink-2);max-width:62ch}
+.step{border-top:1px solid var(--line);padding-block:18px;display:grid;gap:12px}
+.step-h{display:flex;align-items:center;gap:10px}
+.num{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:13px;font-weight:600;background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink-2)}
+.step.is-done .num{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.step.is-active .num{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.step-h h3{font-size:18px;font-weight:700;letter-spacing:-.01em;flex:1;min-width:0}
+.state{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.step.is-done .state{color:var(--ok)}
+.step.is-locked .step-h h3{color:var(--ink-3)}
+.lockmsg{font-size:14px;color:var(--ink-3)}
+.q{font-weight:600}
+.hint{font-size:13px;color:var(--ink-2)}
+
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.opt{font:inherit;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:left;font-weight:600;min-width:0}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .l{flex:none;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--line)}
+.opt.is-ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.is-ok .l{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.opt.is-bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.is-ok){opacity:.55}
+@media (max-width:420px){.opts{grid-template-columns:minmax(0,1fr)}}
+
+.fb{border-radius:10px;padding:11px 14px;font-size:14px;border:1px solid}
+.fb b{display:block;margin-bottom:2px}
+.fb-ok{background:var(--ok-soft);border-color:var(--ok)}
+.fb-ok b{color:var(--ok)}
+.fb-bad{background:var(--bad-soft);border-color:var(--bad)}
+.fb-bad b{color:var(--bad)}
+
+.techs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tech{font:inherit;display:grid;gap:6px;align-content:start;text-align:left;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-width:0}
+.tech:hover:not(:disabled){border-color:var(--accent)}
+.tech svg{width:26px;height:26px;color:var(--accent)}
+.tech b{font-size:14px;line-height:1.25}
+.tech small{font-size:12px;color:var(--ink-2);line-height:1.4}
+.tech.is-sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.tech:disabled{cursor:not-allowed;opacity:.55}
+@media (max-width:520px){.techs{grid-template-columns:minmax(0,1fr)}.tech{grid-template-columns:auto 1fr;column-gap:12px}.tech svg{grid-row:span 2}}
+
+.runrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.runrow small{color:var(--ink-2)}
+.result{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:12px}
+.result.ok{border-color:var(--ok)} .result.warn{border-color:var(--warn)} .result.bad{border-color:var(--bad)}
+.result-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.result-h b{font-family:var(--f-display);font-size:17px}
+.pill{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;padding:4px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.why{font-size:14px;color:var(--ink)}
+.meters{display:grid;gap:12px}
+.meter{display:grid;gap:5px}
+.meter-top{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2)}
+.meter-top b{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.track{height:9px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px;background:var(--accent);transition:width .8s ease}
+.track i.ok{background:var(--ok)} .track i.warn{background:var(--warn)} .track i.bad{background:var(--bad)}
+.meter small{font-size:12px;color:var(--ink-3)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.seg span{font-size:12px;text-align:center;padding:4px 0;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-3)}
+.seg span.on{background:var(--silt-soft);border-color:var(--silt);color:var(--ink);font-weight:700}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);font-weight:600}
+tr:last-child td{border-bottom:none}
+.tbl-title{font-size:13px;font-weight:600;color:var(--ink-2)}
+
+.refl{display:grid;gap:14px}
+.refl label{display:grid;gap:6px;font-weight:600;font-size:14px}
+.wc{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);justify-self:end;font-weight:400}
+.wc.ok{color:var(--ok)}
+.points{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px}
+.points h4{margin:0;font-family:var(--f-display);font-size:16px}
+.points ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.points p{font-size:12px;color:var(--ink-3)}
+
+/* recap */
+.recap{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;display:grid;gap:14px;box-shadow:var(--shadow);min-width:0}
+@media (max-width:480px){.recap{padding:16px}}
+.recap h2{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.recap-sub{color:var(--ink-2);font-size:14px}
+.recap td{white-space:normal;vertical-align:top;min-width:120px}
+.recap ul{margin:0;padding-left:16px}
+.rlist{display:grid;gap:12px}
+.rcase{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.rcase h4{margin:0;font-family:var(--f-display);font-size:15px}
+.rcase dl{margin:0;display:grid;gap:6px;font-size:14px}
+.rcase dt{font-weight:600;color:var(--ink-2);font-size:13px}
+.rcase dd{margin:0 0 4px;overflow-wrap:anywhere}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.copybox{width:100%;min-height:160px;font-family:var(--f-mono);font-size:12px}
+.muted{color:var(--ink-3);font-size:13px}
+@media (prefers-reduced-motion: reduce){.track i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Lab Virtual IPA · Pemisahan Campuran</p>
+      <h1>Menjernihkan Air Sungai yang Tercemar</h1>
+      <p class="lede">Amati sampel air di gelas kimia, kenali jenis campurannya, pilih teknologi pemisahan, lalu buktikan pilihanmu lewat simulasi.</p>
+    </div>
+    <label class="namefield" for="nama"><span>Nama siswa</span><input id="nama" type="text" placeholder="Tulis nama lengkapmu" autocomplete="name"></label>
+  </header>
+
+  <nav class="cases" id="cases" aria-label="Pilih kasus"></nav>
+  <ol class="steps" id="steps" aria-label="Kemajuan kasus ini"></ol>
+
+  <main class="lab">
+    <section class="viewer" aria-label="Pengamatan sampel">
+      <div class="frame">
+        <canvas id="cv" width="640" height="440" role="img" aria-label="Ilustrasi sungai dan gelas kimia berisi sampel air"></canvas>
+      </div>
+      <div class="caption" id="caption" aria-live="polite" hidden></div>
+      <div class="controls" id="controls"></div>
+      <p class="obs" id="obs" aria-live="polite"></p>
+    </section>
+    <section class="sheet" id="sheet" aria-label="Lembar kerja"></section>
+  </main>
+
+  <section class="recap" id="recap" aria-label="Rekap hasil"></section>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const CASES=[
+  {name:'Air Sungai 1',short:'Keruh merata',swatch:'#c6a77f',answer:'koloid',
+   desc:'Air sungai tampak keruh. Di dalamnya terdapat partikel sangat kecil yang tetap tersebar dan tidak cepat mengendap. Masyarakat membutuhkan air yang lebih jernih.'},
+  {name:'Air Sungai 2',short:'Tanah & pasir',swatch:'#86603b',answer:'suspensi',
+   desc:'Air sungai mengandung tanah dan pasir yang terlihat jelas. Setelah didiamkan beberapa saat, sebagian besar partikel turun ke dasar.'},
+  {name:'Air Sungai 3',short:'Garam terlarut',swatch:'#8cc2d0',answer:'larutan',
+   desc:'Air mengandung garam yang telah larut sempurna dan tidak membentuk endapan. Tujuannya adalah memperoleh kembali air dari campuran tersebut.'}
+];
+const MIX={larutan:'Larutan',koloid:'Koloid',suspensi:'Suspensi'};
+const MIX_ORDER=['larutan','koloid','suspensi'];
+const MIX_FB=[
+  {ok:'Partikel koloid sangat kecil, tersebar merata, tidak mengendap, dan menghamburkan cahaya (efek Tyndall).',
+   larutan:'Larutan bening dan tembus pandang, sedangkan air ini keruh. Tekan Sorot Senter: berkas cahayanya terlihat di dalam air, ciri yang tidak dimiliki larutan.',
+   suspensi:'Partikel suspensi cukup besar sehingga mengendap jika didiamkan. Tekan Diamkan 1 Jam: apakah partikel di gelas turun ke dasar?'},
+  {ok:'Suspensi berisi partikel besar yang terlihat dan dapat mengendap jika didiamkan.',
+   larutan:'Pada larutan, zat terlarut tidak terlihat. Di gelas ini butiran tanah dan pasir terlihat jelas.',
+   koloid:'Partikel koloid tidak mengendap. Tekan Diamkan Sebentar: butiran di gelas ini turun dan menumpuk di dasar.'},
+  {ok:'Larutan bersifat homogen, zat terlarut tidak terlihat dan tidak mengendap.',
+   koloid:'Koloid tampak keruh dan menghamburkan cahaya. Tekan Sorot Senter: air ini bening dan berkas cahaya tidak terlihat di dalamnya.',
+   suspensi:'Suspensi membentuk endapan jika didiamkan. Tekan Diamkan 1 Jam: garam di air ini tidak mengendap sama sekali.'}
+];
+const ICON={
+  filtrasi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16l-6 7.5V18l-4 2v-8.5z"/><path d="M7 7h10"/></svg>',
+  koagulasi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="8.5" cy="9" r="2.6"/><circle cx="14" cy="7" r="2"/><circle cx="14.5" cy="13" r="3.2"/><circle cx="8" cy="15" r="1.6"/><path d="M4 20.5h16"/></svg>',
+  distilasi:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v5.5L4.6 15a3.6 3.6 0 0 0 3.2 5.3h4.4a3.6 3.6 0 0 0 3.2-5.3L12 8.5V3"/><path d="M6.5 3h7"/><path d="M12 6l7 4"/><path d="M19 13v1.5"/><path d="M19 17v1"/></svg>'
+};
+const TECH={
+  filtrasi:{name:'Filtrasi',sub:'Penyaringan lewat lapisan kerikil, pasir, dan arang'},
+  koagulasi:{name:'Koagulasi-flokulasi',sub:'Tawas membuat partikel halus menggumpal lalu mengendap'},
+  distilasi:{name:'Distilasi',sub:'Air diuapkan lalu diembunkan kembali'}
+};
+const TECH_ORDER=['filtrasi','koagulasi','distilasi'];
+const EFF_LABEL={filtrasi:'Cepat · tanpa energi panas · biaya rendah',koagulasi:'Butuh tawas dan waktu pengendapan · biaya sedang',distilasi:'Lambat · butuh energi panas besar · biaya tinggi'};
+const STATUS={ok:'BERHASIL',warn:'KURANG EFISIEN',bad:'GAGAL'};
+const BEFORE_CLAR=[20,10,100], BEFORE_SALT=['rendah','rendah','tinggi'];
+const RESULTS=[
+  {filtrasi:{status:'bad',clarity:25,salt:'rendah',eff:85,why:'Partikel koloid berukuran 1–1000 nm, jauh lebih kecil daripada celah antarbutir pasir. Partikel lolos melewati saringan, jadi hasilnya masih keruh.'},
+   koagulasi:{status:'ok',clarity:90,salt:'rendah',eff:75,why:'Tawas menetralkan muatan partikel koloid sehingga partikel saling menempel menjadi flok. Flok cukup besar dan berat untuk mengendap, air bagian atas menjadi jernih.'},
+   distilasi:{status:'warn',clarity:98,salt:'rendah',eff:20,why:'Air memang jernih, tetapi memanaskan air dalam jumlah besar butuh energi besar dan waktu lama. Tidak praktis untuk kebutuhan air warga.'}},
+  {filtrasi:{status:'ok',clarity:85,salt:'rendah',eff:90,why:'Butiran pasir dan tanah lebih besar daripada celah saringan, sehingga tertahan di lapisan atas. Air yang keluar sudah jernih.'},
+   koagulasi:{status:'warn',clarity:85,salt:'rendah',eff:50,why:'Bisa menjernihkan, tetapi butuh bahan kimia dan waktu tambahan. Partikel sebesar ini sebenarnya sudah bisa diendapkan atau disaring dengan cara sederhana.'},
+   distilasi:{status:'warn',clarity:98,salt:'rendah',eff:20,why:'Air menjadi jernih, tetapi boros energi untuk partikel yang mudah disaring.'}},
+  {filtrasi:{status:'bad',clarity:100,salt:'tinggi',eff:85,why:'Garam terlarut berupa ion yang sangat kecil, ikut lolos bersama air. Air terlihat bening tetapi masih asin.'},
+   koagulasi:{status:'bad',clarity:100,salt:'tinggi',eff:40,why:'Tidak ada partikel padat yang bisa digumpalkan, jadi flok tidak terbentuk. Garam tetap terlarut di dalam air.'},
+   distilasi:{status:'ok',clarity:100,salt:'rendah',eff:45,why:'Air menguap lalu mengembun kembali menjadi air murni. Garam tidak ikut menguap dan tertinggal sebagai kerak putih di dasar labu.'}}
+];
+const REFL_Q=['Mengapa teknologi yang dipilih cocok dengan karakteristik campuran?','Apakah satu metode pemisahan selalu cukup untuk mengatasi pencemaran air?','Apa hubungan ukuran partikel dengan efektivitas metode pemisahan?'];
+const OBS=[
+  {rest:'Air keruh merata dari atas sampai bawah. Partikelnya sangat kecil dan bergerak acak (zig-zag).',
+   after:'Sudah didiamkan 1 jam: partikel tetap tersebar dan tidak ada endapan di dasar gelas.',
+   beam:'Berkas cahaya senter terlihat jelas di dalam air karena dihamburkan partikel (efek Tyndall).'},
+  {rest:'Butiran tanah dan pasir terlihat jelas melayang di air yang baru diambil dari sungai.',
+   after:'Sudah didiamkan: sebagian besar butiran turun dan membentuk endapan. Air bagian atas lebih jernih.',
+   beam:'Cahaya senter terhalang butiran besar sehingga meredup sebelum menembus gelas.'},
+  {rest:'Kristal garam larut sempurna. Air bening dan tidak ada partikel yang terlihat.',
+   after:'Sudah didiamkan 1 jam: tidak ada perubahan dan tidak ada endapan.',
+   beam:'Berkas cahaya tidak terlihat di dalam air. Cahaya menembus lurus tanpa dihamburkan.'}
+];
+
+/* ================= STATE ================= */
+const KEY='labvirtual-air-v1';
+const freshCase=()=>({mixAns:null,mixOk:false,tries:0,tech:null,history:[],refl:['','',''],saved:false});
+let S={name:'',cur:0,cases:[freshCase(),freshCase(),freshCase()]};
+try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);if(d&&Array.isArray(d.cases)&&d.cases.length===3)S=d;}}catch(e){}
+let saveTimer=null;
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}},250);}
+let running=false;
+const success=st=>st.history.some(h=>h.status==='ok');
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const words=s=>(s.trim().match(/\S+/g)||[]).length;
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[(Math.random()*a.length)|0];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+const rgba=c=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${c[3]})`;
+const mix4=(a,b,t)=>[lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t),lerp(a[3],b[3],t)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const W=640,H=440;
+const SOIL=['#6b4524','#7c5130','#5a3a1e'],SAND=['#d4b06a','#c89c55','#e0c283'];
+const TINT={colloid:[198,168,126,.84],muddy:[128,88,52,.86],settled:[172,156,124,.40],salty:[176,219,233,.40],clear:[198,229,238,.30],cloudyF:[204,178,140,.68],distilled:[206,235,245,.22]};
+
+/* ================= CANVAS ================= */
+const cv=$('#cv'),ctx=cv.getContext('2d');
+function fit(){const r=cv.getBoundingClientRect();if(!r.width)return;const d=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(r.width*d);cv.height=Math.round(r.width*H/W*d);ctx.setTransform(cv.width/W,0,0,cv.height/H,0,0);}
+new ResizeObserver(fit).observe(cv);
+
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function label(t,x,y,o={}){ctx.font=`${o.w||400} ${o.s||12}px "JetBrains Mono", ui-monospace, monospace`;ctx.textAlign=o.a||'left';ctx.textBaseline='alphabetic';if(o.halo){ctx.lineWidth=3;ctx.strokeStyle=o.halo;ctx.strokeText(t,x,y);}ctx.fillStyle=o.c||'#22363b';ctx.fillText(t,x,y);}
+function tag(t,x,y){ctx.font='600 12px "JetBrains Mono", ui-monospace, monospace';const w=ctx.measureText(t).width+18;rr(x,y,w,24,7);ctx.fillStyle='rgba(255,255,255,.92)';ctx.fill();ctx.strokeStyle='rgba(30,60,66,.25)';ctx.lineWidth=1;ctx.stroke();label(t,x+9,y+16,{w:600,c:'#1b3a3f'});}
+function beakerPath(g,close){ctx.beginPath();ctx.moveTo(g.x,g.y);ctx.lineTo(g.x,g.y+g.h-12);ctx.quadraticCurveTo(g.x,g.y+g.h,g.x+12,g.y+g.h);ctx.lineTo(g.x+g.w-12,g.y+g.h);ctx.quadraticCurveTo(g.x+g.w,g.y+g.h,g.x+g.w,g.y+g.h-12);ctx.lineTo(g.x+g.w,g.y);if(close)ctx.closePath();}
+function glassBack(g){beakerPath(g,true);ctx.fillStyle='rgba(238,248,251,.22)';ctx.fill();}
+function glassFront(g,scale=true){
+  ctx.lineJoin='round';
+  beakerPath(g,false);ctx.strokeStyle='rgba(60,92,102,.75)';ctx.lineWidth=2.2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(g.x,g.y+9);ctx.quadraticCurveTo(g.x-2,g.y,g.x-10,g.y-4);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(g.x+g.w,g.y);ctx.lineTo(g.x+g.w+3,g.y-3);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(g.x-10,g.y-4);ctx.lineTo(g.x+g.w+3,g.y-3);ctx.strokeStyle='rgba(60,92,102,.22)';ctx.lineWidth=1.4;ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.38)';rr(g.x+g.w-19,g.y+16,5,g.h-48,3);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.18)';rr(g.x+g.w-29,g.y+24,2.5,g.h-80,2);ctx.fill();
+  if(scale&&g.w>=100&&g.h>=150){
+    const step=(g.h-44)/5.3;ctx.strokeStyle='rgba(28,58,66,.7)';ctx.lineWidth=1.2;
+    for(let i=1;i<=10;i++){const y=g.y+g.h-10-i*step/2;const major=i%2===0;ctx.beginPath();ctx.moveTo(g.x+5,y);ctx.lineTo(g.x+(major?20:12),y);ctx.stroke();
+      if(major)label(String(i*50),g.x+24,y+4,{s:10,c:'rgba(20,45,52,.95)',halo:'rgba(255,255,255,.65)'});}
+    label('mL',g.x+8,g.y+16,{s:10,c:'rgba(20,45,52,.9)',halo:'rgba(255,255,255,.6)'});
+  }
+}
+
+/* ---------- Sample: air di dalam gelas ---------- */
+class Sample{
+  constructor(g,o={}){
+    this.g=g;this.o=o;this.level=o.level??.78;
+    this.tint=(o.tint||TINT.clear).slice();this.tint0=this.tint.slice();this.tintEnd=(o.tintEnd||TINT.clear).slice();
+    this.scatter=o.scatter||'none';this.fineColor=o.fineColor||[118,84,50];this.sedColor=o.sedColor||'#6e4c2c';
+    this.fines=[];this.grains=[];this.flocs=[];this.crystals=[];this.powder=[];
+    this.settling=false;this.swirl=0;this.t=rand(0,9);this.settledN=0;
+    const b=this.box();this.nb=Math.ceil((b.R-b.L)/4);this.hm=new Float32Array(this.nb);
+    for(let i=0;i<(o.fines||0);i++)this.fines.push({x:rand(b.L,b.R),y:rand(b.T,b.B),a:rand(.3,.75),s:rand(1.1,2),vy:rand(10,22)});
+    for(let i=0;i<(o.grains||0);i++){const sand=Math.random()<.45;this.grains.push({x:rand(b.L+4,b.R-4),y:rand(b.T+8,b.B-10),r:rand(1.9,3.9),c:sand?pick(SAND):pick(SOIL),ph:rand(0,6.3),vy:0,set:false});}
+    this.totalSettle=this.grains.length+(o.finesSink?this.fines.length:0);
+    if(o.crystals)for(let i=0;i<7;i++)this.crystals.push({x:rand(b.L+30,b.R-30),y:g.y-rand(10,60),s:rand(5,7.5),rot:rand(0,1.5),vy:rand(28,42),delay:rand(0,1.4)});
+    if(o.flocBed){for(let i=0;i<o.flocBed;i++){const f=this.newFloc(rand(b.L+8,b.R-8),0,rand(4.5,7.5),o.flocColor);f.set=true;f.y=b.B-this.hm[this.bin(f.x)]-f.r*.55;this.deposit(f.x,f.r*.9);this.flocs.push(f);}}
+  }
+  box(){const g=this.g;return{L:g.x+6,R:g.x+g.w-6,T:g.y+g.h*(1-this.level),B:g.y+g.h-5};}
+  bin(x){const b=this.box();return clamp(((x-b.L)/4)|0,0,this.nb-1);}
+  deposit(x,amt){const i=this.bin(x),w=[.25,.6,1,.6,.25];for(let k=-2;k<=2;k++){const j=i+k;if(j>=0&&j<this.nb)this.hm[j]+=amt*w[k+2]*.5;}}
+  newFloc(x,y,r,col){const bl=[];for(let k=0;k<7;k++)bl.push([rand(-.62,.62),rand(-.62,.62),rand(.42,.78)]);return{x,y,r,bl,col:col||[132,94,58],vy:0,set:false,sink:false};}
+  swirlPt(p,b,dt){if(!this.swirl)return;const cx=(b.L+b.R)/2,cy=(b.T+b.B)/2,k=(b.B-b.T)/(b.R-b.L||1);const dx=p.x-cx,dy=p.y-cy;p.x+=-dy/k*this.swirl*dt;p.y+=dx*k*this.swirl*dt;}
+  update(dt,sp=1){
+    this.t+=dt*sp;const b=this.box();const j=1.5*Math.min(sp,3);
+    for(let i=this.fines.length-1;i>=0;i--){const p=this.fines[i];
+      p.x+=(Math.random()-.5)*j*2;p.y+=(Math.random()-.5)*j*2;this.swirlPt(p,b,dt);
+      if(this.settling&&this.o.finesSink){p.y+=p.vy*dt*sp;const fl=b.B-this.hm[this.bin(p.x)];if(p.y>=fl){this.fines.splice(i,1);this.deposit(p.x,.35);this.settledN++;continue;}}
+      p.x=clamp(p.x,b.L+1,b.R-2);p.y=clamp(p.y,b.T+1,b.B-2);}
+    for(const p of this.grains){if(p.set)continue;
+      if(this.settling){p.vy=Math.min(p.vy+160*dt*sp,16+p.r*16);p.y+=p.vy*dt*sp;p.x+=Math.sin(this.t*2+p.ph)*4*dt;
+        const fl=b.B-this.hm[this.bin(p.x)]-p.r*.8;if(p.y>=fl){p.y=fl;p.set=true;this.deposit(p.x,p.r*1.1);this.settledN++;}}
+      else{p.x+=Math.sin(this.t*.9+p.ph)*12*dt;p.y+=Math.cos(this.t*.7+p.ph*1.3)*9*dt;this.swirlPt(p,b,dt);
+        p.x=clamp(p.x,b.L+p.r,b.R-p.r);p.y=clamp(p.y,b.T+p.r+2,b.B-p.r-2);}}
+    for(const f of this.flocs){if(f.set)continue;
+      if(f.sink){f.vy=Math.min(f.vy+90*dt,40+f.r*6);f.y+=f.vy*dt;const fl=b.B-this.hm[this.bin(f.x)]-f.r*.55;if(f.y>=fl){f.y=fl;f.set=true;this.deposit(f.x,f.r*.9);}}
+      else{f.x+=(Math.random()-.5)*.7;f.y+=(Math.random()-.5)*.7;this.swirlPt(f,b,dt);f.x=clamp(f.x,b.L+f.r,b.R-f.r);f.y=clamp(f.y,b.T+f.r,b.B-f.r);}}
+    for(let i=this.crystals.length-1;i>=0;i--){const c=this.crystals[i];if(c.delay>0){c.delay-=dt;continue;}c.y+=c.vy*dt;c.rot+=dt*1.4;if(c.y>b.T){c.s-=dt*2.7;c.vy=Math.max(14,c.vy*.985);}if(c.s<=.4)this.crystals.splice(i,1);}
+    for(let i=this.powder.length-1;i>=0;i--){const p=this.powder[i];p.y+=p.vy*dt;p.x+=Math.sin(p.y*.1)*.3;if(p.y>b.T)p.a-=dt*.7;if(p.a<=0)this.powder.splice(i,1);}
+    if(this.settling&&this.totalSettle){this.tint=mix4(this.tint0,this.tintEnd,ease(this.settledN/this.totalSettle*1.15));}
+  }
+  waterPath(){const b=this.box(),r=10;ctx.beginPath();ctx.moveTo(b.L,b.T);ctx.lineTo(b.R,b.T);ctx.lineTo(b.R,b.B-r);ctx.quadraticCurveTo(b.R,b.B,b.R-r,b.B);ctx.lineTo(b.L+r,b.B);ctx.quadraticCurveTo(b.L,b.B,b.L,b.B-r);ctx.closePath();}
+  beamY(){return this.g.y+this.g.h*.64;}
+  draw(beam=false){
+    const b=this.box(),g=this.g;glassBack(g);
+    if(b.B-b.T>1.5){
+      ctx.save();this.waterPath();ctx.clip();
+      ctx.fillStyle=rgba(this.tint);ctx.fillRect(b.L,b.T,b.R-b.L,b.B-b.T);
+      const gr=ctx.createLinearGradient(0,b.T,0,b.B);gr.addColorStop(0,'rgba(255,255,255,.10)');gr.addColorStop(1,'rgba(0,0,0,.07)');ctx.fillStyle=gr;ctx.fillRect(b.L,b.T,b.R-b.L,b.B-b.T);
+      ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(b.L,b.T,b.R-b.L,1.5);
+      let any=false;for(let i=0;i<this.nb;i++)if(this.hm[i]>.2){any=true;break;}
+      if(any){ctx.beginPath();ctx.moveTo(b.L,b.B);for(let i=0;i<this.nb;i++)ctx.lineTo(b.L+i*4+2,b.B-this.hm[i]);ctx.lineTo(b.R,b.B);ctx.closePath();ctx.fillStyle=this.sedColor;ctx.fill();}
+      const by=this.beamY(),bh=22;
+      if(beam&&this.scatter!=='none'){
+        const bg=ctx.createLinearGradient(b.L,0,b.R,0);
+        if(this.scatter==='strong'){bg.addColorStop(0,'rgba(255,244,200,.72)');bg.addColorStop(1,'rgba(255,244,200,.38)');}
+        else if(this.scatter==='blocked'){bg.addColorStop(0,'rgba(255,240,195,.6)');bg.addColorStop(.55,'rgba(255,240,195,.08)');bg.addColorStop(1,'rgba(255,240,195,0)');}
+        else{bg.addColorStop(0,'rgba(255,244,200,.2)');bg.addColorStop(1,'rgba(255,244,200,.08)');}
+        ctx.fillStyle=bg;ctx.fillRect(b.L,by-bh/2,b.R-b.L,bh);}
+      const fc=this.fineColor.join(',');
+      for(const p of this.fines){const lit=beam&&this.scatter!=='none'&&Math.abs(p.y-by)<bh/2;ctx.fillStyle=lit?'rgba(255,252,230,.95)':`rgba(${fc},${p.a})`;ctx.fillRect(p.x,p.y,p.s,p.s);}
+      for(const p of this.grains){ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.283);ctx.fill();}
+      for(const f of this.flocs){const c=f.col.join(',');for(const[dx,dy,k] of f.bl){ctx.fillStyle=`rgba(${c},.88)`;ctx.beginPath();ctx.arc(f.x+dx*f.r,f.y+dy*f.r,Math.max(.8,f.r*k),0,6.283);ctx.fill();}
+        ctx.fillStyle='rgba(255,255,255,.18)';ctx.beginPath();ctx.arc(f.x-f.r*.3,f.y-f.r*.3,f.r*.3,0,6.283);ctx.fill();}
+      ctx.restore();
+    }
+    for(const p of this.powder){ctx.fillStyle=`rgba(250,250,250,${clamp(p.a,0,1)})`;ctx.fillRect(p.x,p.y,2,2);}
+    for(const c of this.crystals){if(c.delay>0)continue;ctx.save();ctx.translate(c.x,c.y);ctx.rotate(c.rot);ctx.fillStyle='rgba(255,255,255,.95)';ctx.strokeStyle='rgba(150,170,180,.8)';ctx.lineWidth=1;ctx.fillRect(-c.s/2,-c.s/2,c.s,c.s);ctx.strokeRect(-c.s/2,-c.s/2,c.s,c.s);ctx.restore();}
+    glassFront(g);
+  }
+}
+const BEFORE=['colloid','suspension','solution'];
+const AFTER=[{filtrasi:'cloudyF',koagulasi:'flocBed1',distilasi:'distilled'},{filtrasi:'clearFine',koagulasi:'flocBed2',distilasi:'distilled'},{filtrasi:'solution',koagulasi:'solution',distilasi:'distilled'}];
+function preset(type,g,ov={}){
+  let o;
+  switch(type){
+    case 'colloid':o={tint:TINT.colloid,fines:320,scatter:'strong',fineColor:[124,90,56]};break;
+    case 'suspension':o={tint:TINT.muddy,tintEnd:TINT.settled,fines:70,finesSink:true,grains:80,scatter:'blocked',fineColor:[96,64,36]};break;
+    case 'solution':o={tint:TINT.salty,scatter:'none'};break;
+    case 'solutionCrystals':o={tint:TINT.salty,scatter:'none',crystals:true};break;
+    case 'cloudyF':o={tint:TINT.cloudyF,fines:210,scatter:'strong',fineColor:[130,96,60]};break;
+    case 'clearFine':o={tint:TINT.clear,fines:10,scatter:'faint',fineColor:[110,80,50]};break;
+    case 'flocBed1':o={tint:[202,228,234,.34],fines:14,scatter:'faint',flocBed:14,flocColor:[150,112,72],sedColor:'#a07d55',fineColor:[140,105,70]};break;
+    case 'flocBed2':o={tint:[200,226,230,.34],fines:12,scatter:'faint',flocBed:13,flocColor:[110,76,44],sedColor:'#6e4c2c'};break;
+    default:o={tint:TINT.distilled,scatter:'none'};
+  }
+  return new Sample(g,Object.assign(o,ov));
+}
+
+/* ---------- Pemandangan sungai ---------- */
+function band(yTop,amp,freq,ph,yBot,fill){ctx.beginPath();ctx.moveTo(0,yBot);for(let x=0;x<=W;x+=16)ctx.lineTo(x,yTop+Math.sin(x*freq+ph)*amp);ctx.lineTo(W,yBot);ctx.closePath();ctx.fillStyle=fill;ctx.fill();}
+function cloud(x,y,s,c){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,34*s,12*s,0,0,6.283);ctx.ellipse(x+20*s,y-8*s,22*s,13*s,0,0,6.283);ctx.ellipse(x-18*s,y-4*s,16*s,10*s,0,0,6.283);ctx.fill();}
+function tree(x,y,s,c){ctx.fillStyle='#5b4330';ctx.fillRect(x-2*s,y-14*s,4*s,14*s);ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y-20*s,11*s,0,6.283);ctx.arc(x-8*s,y-15*s,8*s,0,6.283);ctx.arc(x+8*s,y-15*s,8*s,0,6.283);ctx.fill();}
+function palm(x,y,s){ctx.strokeStyle='#6b5038';ctx.lineWidth=3*s;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+6*s,y-22*s,x+2*s,y-42*s);ctx.stroke();ctx.strokeStyle='#3f7a43';ctx.lineWidth=2.4*s;
+  const tx=x+2*s,ty=y-42*s;[[-24,6],[-18,-8],[0,-14],[18,-8],[24,6],[10,10],[-10,10]].forEach(([dx,dy])=>{ctx.beginPath();ctx.moveTo(tx,ty);ctx.quadraticCurveTo(tx+dx*s*.6,ty+dy*s-8*s,tx+dx*s,ty+dy*s+6*s);ctx.stroke();});}
+function drawScene(ci,tt){
+  const t=RM?0:tt;
+  const sky=ctx.createLinearGradient(0,0,0,200);
+  if(ci===1){sky.addColorStop(0,'#aebcc2');sky.addColorStop(1,'#dfe5e1');}else{sky.addColorStop(0,'#a8d5e6');sky.addColorStop(1,'#ecf6ef');}
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,200);
+  if(ci!==1){const s=ctx.createRadialGradient(92,56,4,92,56,70);s.addColorStop(0,'rgba(255,249,220,1)');s.addColorStop(.25,'rgba(255,240,190,.9)');s.addColorStop(1,'rgba(255,240,190,0)');ctx.fillStyle=s;ctx.fillRect(10,0,170,140);}
+  const cl=ci===1?'rgba(146,157,163,.85)':'rgba(255,255,255,.88)';
+  cloud((210+t*4)%760-60,46,1,cl);cloud((470+t*2.5)%760-60,28,.8,cl);if(ci===1){cloud((60+t*3)%760-60,72,1.25,cl);cloud((360+t*3.5)%760-60,64,1,cl);}
+  if(ci===2){
+    ctx.fillStyle='#79b4ca';ctx.fillRect(0,126,W,34);ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=1.2;
+    for(let i=0;i<10;i++){const x=((i*71+t*6)%(W+40))-20,y=132+(i*7)%24;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+18,y);ctx.stroke();}
+    band(156,2.5,.03,0,200,'#d2c096');
+    for(let i=0;i<8;i++){const x=16+i*44;ctx.fillStyle=i%2?'#e9f2f4':'#d4e6ec';ctx.fillRect(x,163,38,8);ctx.fillStyle=i%3?'#dcebef':'#f2f6f6';ctx.fillRect(x,174,38,7);}
+    [[50,162],[150,161],[300,163]].forEach(([x,y])=>{ctx.fillStyle='#fbfbf8';ctx.beginPath();ctx.moveTo(x-10,y);ctx.lineTo(x,y-11);ctx.lineTo(x+10,y);ctx.fill();ctx.fillStyle='rgba(180,190,195,.6)';ctx.beginPath();ctx.moveTo(x,y-11);ctx.lineTo(x+10,y);ctx.lineTo(x+3,y);ctx.fill();});
+    palm(390,182,.8);palm(610,184,.9);
+  }else{
+    band(116,12,.012,1,200,ci===1?'#9fb79a':'#a9c9a3');band(138,8,.02,2,200,ci===1?'#86a882':'#8db88a');
+    band(160,4,.025,3,200,ci===1?'#5f8650':'#6f9b5d');
+    tree(30,168,1.1,'#4f8a49');tree(80,170,.9,'#5c9952');palm(150,172,.9);tree(560,169,1,'#4f8a49');tree(612,170,1.2,'#5c9952');tree(255,168,.8,'#4f8a49');
+  }
+  const rv=ctx.createLinearGradient(0,176,0,302);
+  const RC=[['#cbb18a','#a88a62'],['#93704a','#6c4d2f'],['#94c8d4','#5d9db1']][ci];rv.addColorStop(0,RC[0]);rv.addColorStop(1,RC[1]);
+  band(176,3,.03,t*.6,304,rv);
+  ctx.strokeStyle='rgba(255,255,255,.24)';ctx.lineWidth=1.5;
+  for(let i=0;i<16;i++){const yy=188+(i*13)%104,spd=(i%3+1)*6,xx=((i*137+t*spd)%(W+120))-60,len=30+(i%4)*12;ctx.beginPath();ctx.moveTo(xx,yy);ctx.quadraticCurveTo(xx+len/2,yy-2,xx+len,yy);ctx.stroke();}
+  if(ci===1){for(let i=0;i<28;i++){const x=((i*53+t*14)%(W+20))-10,y=188+(i*29)%100;ctx.fillStyle=i%3?'#4e331b':'#c9a362';ctx.beginPath();ctx.arc(x,y,1.3+(i%3)*.6,0,6.283);ctx.fill();}
+    ctx.fillStyle='rgba(235,220,190,.5)';for(let i=0;i<6;i++){const x=((i*113+t*14)%(W+40))-20;ctx.beginPath();ctx.ellipse(x,200+i*15,14,2.5,0,0,6.283);ctx.fill();}}
+  if(ci===0){ctx.fillStyle='rgba(255,250,240,.12)';ctx.fillRect(0,180,W,40);}
+  band(296,4,.04,1,330,ci===2?'#9bb07a':'#5f8f4c');
+  const sg=ctx.createLinearGradient(0,306,0,H);
+  if(ci===2){sg.addColorStop(0,'#d0ba92');sg.addColorStop(1,'#af976f');}else if(ci===1){sg.addColorStop(0,'#8c6b49');sg.addColorStop(1,'#644830');}else{sg.addColorStop(0,'#a07e58');sg.addColorStop(1,'#7b5c3c');}
+  band(306,3,.05,2,H,sg);
+  ctx.strokeStyle=ci===2?'#88a065':'#4f7d3f';ctx.lineWidth=1.6;
+  for(let i=0;i<22;i++){const x=12+i*15,y=304+(i%3)*2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-3,y-9);ctx.moveTo(x,y);ctx.lineTo(x+2,y-11);ctx.moveTo(x,y);ctx.lineTo(x+5,y-7);ctx.stroke();}
+  if(ci===1){ctx.fillStyle='rgba(95,66,40,.7)';ctx.beginPath();ctx.ellipse(150,338,46,7,0,0,6.283);ctx.ellipse(250,372,30,5,0,0,6.283);ctx.fill();}
+  const rock=(x,y,rx,ry)=>{ctx.fillStyle='#868e92';ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,6.283);ctx.fill();ctx.fillStyle='#a3aaad';ctx.beginPath();ctx.ellipse(x-rx*.1,y-ry*.35,rx*.78,ry*.5,0,0,6.283);ctx.fill();};
+  rock(90,362,34,13);rock(212,392,22,9);rock(480,402,132,24);
+  if(ci===2){ctx.fillStyle='rgba(250,252,250,.95)';[[80,354,14,4],[100,357,8,3],[205,387,9,3],[430,392,26,4],[520,390,30,5],[470,395,12,3]].forEach(([x,y,a,b])=>{ctx.beginPath();ctx.ellipse(x,y,a,b,0,0,6.283);ctx.fill();});
+    ctx.fillStyle='rgba(250,252,250,.8)';for(let i=0;i<14;i++){ctx.beginPath();ctx.ellipse(20+i*22,300+(i%2)*3,6,1.6,0,0,6.283);ctx.fill();}}
+}
+const SG={x:390,y:112,w:180,h:282};
+function drawTorch(s){
+  const by=s.beamY(),g=s.g;
+  const cone=ctx.createLinearGradient(352,0,g.x,0);cone.addColorStop(0,'rgba(255,246,210,.45)');cone.addColorStop(1,'rgba(255,246,210,.12)');
+  ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(350,by-7);ctx.lineTo(g.x+2,by-11);ctx.lineTo(g.x+2,by+11);ctx.lineTo(350,by+7);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#2f3538';rr(298,by-8,42,16,5);ctx.fill();ctx.fillStyle='#454d51';rr(336,by-12,15,24,4);ctx.fill();
+  ctx.fillStyle='#fff6cf';rr(348,by-9,4,18,2);ctx.fill();ctx.fillStyle='#d5552f';rr(312,by-10,8,4,2);ctx.fill();
+}
+function drawExit(s){
+  const by=s.beamY(),x=s.g.x+s.g.w+4;const k=s.scatter==='none'?.85:s.scatter==='strong'?.4:s.scatter==='faint'?.7:.06;
+  const gl=ctx.createRadialGradient(x+8,by,1,x+8,by,26);gl.addColorStop(0,`rgba(255,248,215,${k})`);gl.addColorStop(1,'rgba(255,248,215,0)');ctx.fillStyle=gl;ctx.fillRect(x-20,by-30,60,60);
+}
+function drawClock(p,txt){
+  const x=W-48,y=44;ctx.fillStyle='rgba(255,255,255,.94)';ctx.beginPath();ctx.arc(x,y,24,0,6.283);ctx.fill();ctx.strokeStyle='#1f4a4f';ctx.lineWidth=2;ctx.stroke();
+  for(let i=0;i<12;i++){const a=i/12*6.283;ctx.beginPath();ctx.moveTo(x+Math.cos(a)*19,y+Math.sin(a)*19);ctx.lineTo(x+Math.cos(a)*22,y+Math.sin(a)*22);ctx.lineWidth=1;ctx.stroke();}
+  const a=p*6.283*4-1.57;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*16,y+Math.sin(a)*16);ctx.stroke();
+  const a2=p*6.283*.33-1.57;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a2)*10,y+Math.sin(a2)*10);ctx.stroke();
+  ctx.font='600 12px "JetBrains Mono", ui-monospace, monospace';const w=ctx.measureText(txt).width+14;rr(x-w/2,y+30,w,20,6);ctx.fillStyle='rgba(255,255,255,.94)';ctx.fill();label(txt,x,y+44,{a:'center',w:600,c:'#1f4a4f'});
+}
+
+/* ---------- Lab ---------- */
+function drawLab(){
+  const g=ctx.createLinearGradient(0,0,0,405);g.addColorStop(0,'#e5eef1');g.addColorStop(1,'#d2dfe3');ctx.fillStyle=g;ctx.fillRect(0,0,W,405);
+  ctx.strokeStyle='rgba(120,150,160,.16)';ctx.lineWidth=1;for(let x=0;x<=W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,405);ctx.stroke();}for(let y=0;y<405;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.fillStyle='#4d5b61';ctx.fillRect(0,405,W,35);ctx.fillStyle='#6b7a80';ctx.fillRect(0,405,W,5);
+}
+
+class FiltSim{
+  constructor(ci){this.ci=ci;this.tech='filtrasi';this.t=0;this.dur=7.8;this.tint=preset(BEFORE[ci],{x:0,y:0,w:100,h:100}).tint0;
+    this.out=preset(AFTER[ci].filtrasi,{x:275,y:300,w:110,h:100},{level:.02});this.drops=[];this.dropT=0;
+    this.gravel=[];for(let i=0;i<34;i++)this.gravel.push([rand(274,386),rand(113,148),rand(4,7),pick(['#8f9597','#a5abad','#7d8385','#b4b9ba'])]);
+    this.sand=[];for(let i=0;i<90;i++)this.sand.push([rand(272,388),rand(151,199),pick(['#c4a463','#e6d29e','#b8954f'])]);
+    this.coal=[];for(let i=0;i<26;i++)this.coal.push([rand(272,384),rand(201,234),rand(4,8),rand(3,6)]);
+    this.res=[];for(let i=0;i<40;i++)this.res.push([rand(274,386),rand(0,1),rand(1.5,3),pick(SOIL.concat(SAND))]);
+    this.stages=[[0,'Air sampel dituangkan ke saringan.'],[1.8,'Air merembes melewati lapisan kerikil, pasir, dan arang.'],[3.8,'Air hasil saringan menetes ke gelas penampung.'],[6.4,ci===0?'Partikel koloid ikut lolos melewati celah saringan.':ci===1?'Pasir dan tanah tertahan di lapisan atas saringan.':'Garam terlarut ikut lolos bersama air.']];}
+  update(dt){this.t+=dt;const t=this.t;this.out.level=.02+.66*ease((t-3.8)/3.4);this.out.update(dt);
+    if(t>3.6&&t<7.3){this.dropT-=dt;if(this.dropT<=0){this.dropT=.09;this.drops.push({y:292,v:40});}}
+    const top=this.out.box().T;for(let i=this.drops.length-1;i>=0;i--){const d=this.drops[i];d.v+=600*dt;d.y+=d.v*dt;if(d.y>=top)this.drops.splice(i,1);}}
+  bottle(){ctx.beginPath();ctx.moveTo(270,40);ctx.lineTo(270,252);ctx.quadraticCurveTo(272,276,322,282);ctx.lineTo(322,293);ctx.lineTo(338,293);ctx.lineTo(338,282);ctx.quadraticCurveTo(388,276,390,252);ctx.lineTo(390,40);}
+  draw(){const t=this.t;drawLab();
+    ctx.fillStyle='#7f8b90';ctx.fillRect(452,30,6,375);ctx.fillRect(390,150,66,6);ctx.fillRect(385,270,72,5);
+    this.out.draw();
+    ctx.save();this.bottle();ctx.closePath();ctx.clip();
+    ctx.fillStyle='rgba(236,246,249,.35)';ctx.fillRect(270,40,120,253);
+    ctx.fillStyle='#f0ebe1';ctx.fillRect(270,236,120,16);
+    ctx.fillStyle='#2e2d2b';ctx.fillRect(270,200,120,36);for(const[x,y,w,h] of this.coal){ctx.fillStyle='#1b1a19';ctx.fillRect(x,y,w,h);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(x,y,w,1);}
+    ctx.fillStyle='#d9bf85';ctx.fillRect(270,150,120,50);for(const[x,y,c] of this.sand){ctx.fillStyle=c;ctx.fillRect(x,y,1.6,1.6);}
+    ctx.fillStyle='#9ba1a3';ctx.fillRect(270,110,120,40);for(const[x,y,r,c] of this.gravel){ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,r,r*.8,0,0,6.283);ctx.fill();}
+    const wet=110+142*ease((t-1.1)/2.7);ctx.fillStyle=this.ci===0?'rgba(150,120,85,.28)':'rgba(40,30,20,.16)';ctx.fillRect(270,110,120,wet-110);
+    const th=[2.5,11,0][this.ci]*ease((t-1.4)/3);if(th>0){ctx.fillStyle=this.ci===1?'#7b5533':'#b49470';ctx.fillRect(270,110-th,120,th);if(this.ci===1)for(const[x,f,r,c] of this.res){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,110-th*f,r*ease((t-1.4)/3),0,6.283);ctx.fill();}}
+    const pool=50*ease(t/1.6)*(1-ease((t-2.1)/3.6));if(pool>.5){ctx.fillStyle=rgba(this.tint);ctx.fillRect(270,110-th-pool,120,pool);}
+    ctx.restore();
+    this.bottle();ctx.strokeStyle='rgba(60,92,102,.75)';ctx.lineWidth=2.2;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.35)';rr(376,52,5,190,3);ctx.fill();
+    [['Kerikil',130],['Pasir',176],['Arang',219],['Kapas',246]].forEach(([n,y])=>{ctx.strokeStyle='rgba(30,55,60,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(266,y-4);ctx.lineTo(236,y-4);ctx.stroke();label(n,230,y,{a:'right',s:12,w:600});});
+    const tilt=ease(t/.6)*1.0,fade=1-ease((t-2.3)/.5);
+    if(fade>0){ctx.save();ctx.globalAlpha=fade;ctx.translate(205,62);ctx.rotate(tilt);ctx.fillStyle=rgba(this.tint);ctx.fillRect(-26,-6+tilt*10,52,40-tilt*10);ctx.strokeStyle='rgba(60,92,102,.75)';ctx.lineWidth=2;ctx.strokeRect(-28,-36,56,72);ctx.restore();}
+    if(t>.5&&t<2.25){ctx.strokeStyle=rgba([this.tint[0],this.tint[1],this.tint[2],Math.max(.55,this.tint[3])]);ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(250,67);ctx.quadraticCurveTo(292,64,302,104);ctx.stroke();ctx.lineCap='butt';}
+    const dc=this.out.tint;ctx.fillStyle=rgba([dc[0]-30,dc[1]-30,dc[2]-20,Math.min(1,dc[3]+.45)]);for(const d of this.drops){ctx.beginPath();ctx.ellipse(330,d.y,2.2,3.4,0,0,6.283);ctx.fill();}
+    if(this.ci===2&&t>6.4)tag('Kadar garam: tinggi',400,330);}
+}
+
+class CoagSim{
+  constructor(ci){this.ci=ci;this.tech='koagulasi';this.t=0;this.dur=8.6;this.s=preset(BEFORE[ci],{x:220,y:118,w:200,h:282});this.made=false;this.total=1;this.sunk=false;
+    this.stages=[[0,'Serbuk tawas (koagulan) ditaburkan ke dalam air.'],[1.6,'Pengadukan cepat agar tawas tercampur merata.'],[3.4,ci===2?'Pengadukan lambat. Tidak ada partikel padat, jadi flok tidak terbentuk.':'Pengadukan lambat. Partikel halus saling menempel membentuk gumpalan (flok).'],[5.8,ci===2?'Air tetap bening, tetapi garam masih terlarut.':'Flok yang berat mengendap ke dasar. Air bagian atas menjadi jernih.']];}
+  update(dt){this.t+=dt;const t=this.t,s=this.s,b=s.box();
+    if(t<1.6&&Math.random()<.9)for(let k=0;k<3;k++)s.powder.push({x:rand(318,350),y:rand(70,80),vy:rand(70,110),a:1});
+    s.swirl=t<1.6?0:t<3.4?2.2*ease((t-1.6)/.4):t<5.8?.55:Math.max(0,.55-(t-5.8));
+    if(t>=3.4&&!this.made&&this.ci!==2){this.made=true;const n=this.ci===0?16:12,col=this.ci===0?[150,112,72]:[108,74,42];for(let i=0;i<n;i++)s.flocs.push(s.newFloc(rand(b.L+16,b.R-16),rand(b.T+20,b.B-34),1.6,col));this.total=s.fines.length+s.grains.length;}
+    if(this.made){
+      const k=ease((t-3.4)/1.2)*2.4,force=t>=5.8;
+      const absorb=(arr,area)=>{for(let i=arr.length-1;i>=0;i--){const p=arr[i];let best=null,bd=1e9;for(const f of s.flocs){const d=(f.x-p.x)**2+(f.y-p.y)**2;if(d<bd){bd=d;best=f;}}
+        if(force||Math.sqrt(bd)<best.r+1.5){arr.splice(i,1);best.r=Math.min(11,Math.sqrt(best.r*best.r+area(p)));}else{p.x+=(best.x-p.x)*k*dt;p.y+=(best.y-p.y)*k*dt;}}};
+      absorb(s.fines,()=>1.6);absorb(s.grains,p=>p.r*p.r*.5);
+      const frac=1-(s.fines.length+s.grains.length)/this.total;
+      s.tint=mix4(s.tint0,[202,228,234,.34],.4*frac+.6*ease((t-5.8)/2.2));
+      if(force)s.flocs.forEach((f,i)=>{if(t>5.8+i*.07)f.sink=true;});
+    }
+    if(this.ci===2)s.tint=s.tint0.slice();
+    s.update(dt);}
+  draw(){const t=this.t;drawLab();this.s.draw();
+    if(t>=1.6&&t<5.8){const sp=t<3.4?9:3.5,x=320+Math.sin(t*sp)*(t<3.4?44:28);ctx.strokeStyle='rgba(205,230,236,.9)';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x+14,58);ctx.lineTo(x,380);ctx.stroke();ctx.strokeStyle='rgba(60,92,102,.6)';ctx.lineWidth=1.2;ctx.stroke();ctx.lineCap='butt';
+      if(t<3.4){const b=this.s.box();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=1.4;ctx.setLineDash([10,8]);ctx.lineDashOffset=-t*60;for(let i=1;i<=3;i++){ctx.beginPath();ctx.ellipse(320,(b.T+b.B)/2,24*i,8*i,0,0,6.283);ctx.stroke();}ctx.setLineDash([]);}}
+    const sa=1-ease((t-1.8)/.5);if(sa>0){ctx.save();ctx.globalAlpha=sa;ctx.strokeStyle='#8a8f92';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(352,64);ctx.lineTo(420,30);ctx.stroke();ctx.fillStyle='#a5abae';ctx.beginPath();ctx.ellipse(336,70,20,8,-.4,0,6.283);ctx.fill();ctx.fillStyle='#f7f7f5';ctx.beginPath();ctx.ellipse(336,66,13,5,-.4,0,6.283);ctx.fill();label('Tawas',428,34,{w:600});ctx.restore();ctx.lineCap='butt';}
+    if(this.ci===2&&t>5.8)tag('Kadar garam: tinggi',436,150);}
+}
+
+class DistSim{
+  constructor(ci){this.ci=ci;this.tech='distilasi';this.t=0;this.dur=8.8;this.tint=preset(BEFORE[ci],{x:0,y:0,w:100,h:100}).tint0;
+    this.out=preset('distilled',{x:440,y:282,w:104,h:118},{level:.02});this.bub=[];this.puffs=[];this.drops=[];this.pt=0;
+    this.res=[];for(let i=0;i<34;i++){const a=rand(.35,2.8);this.res.push([165+Math.cos(a)*rand(30,50),300+Math.sin(a)*rand(42,54),rand(2.5,5)]);}
+    this.stages=[[0,'Labu berisi air sampel dipanaskan.'],[2,'Air mendidih pada 100 °C dan berubah menjadi uap.'],[3.6,'Uap didinginkan di kondensor lalu mengembun menjadi tetesan air.'],[6.6,ci===2?'Garam tidak ikut menguap dan tertinggal sebagai kerak putih di labu.':'Pengotor tertinggal di labu. Prosesnya butuh energi panas yang besar.']];}
+  path(s){const L1=80,L2=Math.hypot(285,96);const d=s*(L1+L2);if(d<L1)return[165,246-d];const k=(d-L1)/L2;return[165+285*k,166+96*k];}
+  update(dt){this.t+=dt;const t=this.t;this.out.level=.02+.55*ease((t-3.9)/4.4);this.out.update(dt);
+    const lvl=this.level();if(t>1.2)for(let k=0;k<2;k++)if(Math.random()<.6)this.bub.push({x:rand(130,200),y:rand(330,352),r:rand(1.5,3.5)});
+    for(let i=this.bub.length-1;i>=0;i--){const b=this.bub[i];b.y-=60*dt;b.x+=Math.sin(b.y*.2)*.4;if(b.y<lvl)this.bub.splice(i,1);}
+    if(t>2&&t<7.9){this.pt-=dt;if(this.pt<=0){this.pt=.14;this.puffs.push({s:0,r:rand(4,7)});}}
+    for(let i=this.puffs.length-1;i>=0;i--){const p=this.puffs[i];p.s+=dt*.55;if(p.s>=1){this.puffs.splice(i,1);this.drops.push({y:266,v:20});}}
+    const top=this.out.box().T;for(let i=this.drops.length-1;i>=0;i--){const d=this.drops[i];d.v+=600*dt;d.y+=d.v*dt;if(d.y>=top)this.drops.splice(i,1);}}
+  level(){return 288+46*ease((this.t-2)/5.8);}
+  draw(){const t=this.t;drawLab();
+    ctx.fillStyle='#7f8b90';ctx.fillRect(60,40,6,365);ctx.fillRect(60,200,100,6);
+    ctx.fillStyle='#5b6266';ctx.beginPath();ctx.moveTo(140,405);ctx.lineTo(190,405);ctx.lineTo(180,378);ctx.lineTo(150,378);ctx.closePath();ctx.fill();
+    const fl=1+Math.sin(t*20)*.08+Math.sin(t*33)*.05;ctx.fillStyle='rgba(80,140,255,.85)';ctx.beginPath();ctx.ellipse(165,370,8,10*fl,0,0,6.283);ctx.fill();ctx.fillStyle='rgba(255,170,60,.75)';ctx.beginPath();ctx.ellipse(165,366,5,14*fl,0,0,6.283);ctx.fill();
+    ctx.save();ctx.beginPath();ctx.arc(165,300,56,0,6.283);ctx.clip();ctx.fillStyle='rgba(236,246,249,.3)';ctx.fillRect(100,240,130,120);
+    const lvl=this.level();ctx.fillStyle=rgba(this.tint);ctx.fillRect(100,lvl,130,80);
+    const ra=ease((t-3.6)/4);if(ra>0){if(this.ci===2){for(const[x,y,s] of this.res){ctx.fillStyle=`rgba(255,255,255,${ra})`;ctx.fillRect(x-s/2,y-s/2,s,s);ctx.strokeStyle=`rgba(160,175,185,${ra})`;ctx.lineWidth=.8;ctx.strokeRect(x-s/2,y-s/2,s,s);}}
+      else{ctx.strokeStyle=`rgba(${this.ci===1?'100,68,38':'150,115,78'},${ra})`;ctx.lineWidth=8;ctx.beginPath();ctx.arc(165,300,52,.35,2.8);ctx.stroke();}}
+    ctx.fillStyle='rgba(255,255,255,.75)';for(const b of this.bub){ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.283);ctx.fill();}
+    ctx.restore();
+    ctx.strokeStyle='rgba(60,92,102,.75)';ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(165,300,56,-1.39,4.53);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(155,245);ctx.lineTo(155,150);ctx.moveTo(175,245);ctx.lineTo(175,176);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(175,160);ctx.lineTo(458,256);ctx.moveTo(175,176);ctx.lineTo(452,270);ctx.stroke();
+    ctx.save();ctx.translate(215,184);ctx.rotate(Math.atan2(96,285));ctx.fillStyle='rgba(140,200,228,.5)';rr(0,-16,215,32,8);ctx.fill();ctx.strokeStyle='rgba(60,92,102,.7)';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#8fc6de';ctx.fillRect(196,14,10,14);ctx.fillRect(10,-28,10,14);ctx.restore();
+    label('air dingin masuk',392,296,{s:10,a:'center',c:'#2a4a52'});label('air keluar',212,158,{s:10,a:'center',c:'#2a4a52'});
+    ctx.fillStyle='rgba(230,240,244,.9)';rr(162,108,6,74,3);ctx.fill();ctx.strokeStyle='rgba(60,92,102,.6)';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='#d64235';ctx.fillRect(163.5,150-ease(t/2.2)*34,3,32+ease(t/2.2)*34);
+    const temp=Math.round(27+73*ease(t/2.2));tag(temp+' °C',176,106);
+    for(const p of this.puffs){const[x,y]=this.path(p.s);const a=p.s<.3?.75:.75*(1-(p.s-.3)/.7);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.beginPath();ctx.arc(x,y-2,p.r*(1-p.s*.5),0,6.283);ctx.fill();}
+    this.out.draw();
+    ctx.fillStyle='rgba(120,190,225,.95)';for(const d of this.drops){ctx.beginPath();ctx.ellipse(456,d.y,2.2,3.4,0,0,6.283);ctx.fill();}
+    ctx.fillStyle='rgba(255,255,255,.94)';rr(W-210,16,192,50,8);ctx.fill();label('Energi pemanasan',W-200,34,{s:11,w:600});
+    ctx.fillStyle='#e3e8ea';rr(W-200,44,172,10,5);ctx.fill();ctx.fillStyle='#e0633a';rr(W-200,44,Math.max(10,172*.95*ease(t/this.dur)),10,5);ctx.fill();}
+}
+
+class ResultView{
+  constructor(ci,tech){this.ci=ci;this.tech=tech;this.r=RESULTS[ci][tech];
+    this.before=preset(BEFORE[ci],{x:110,y:118,w:160,h:236});this.after=preset(AFTER[ci][tech],{x:370,y:118,w:160,h:236});}
+  update(dt){this.before.update(dt);this.after.update(dt);}
+  draw(){drawLab();label('SEBELUM',190,96,{a:'center',s:13,w:600});label('SESUDAH',450,96,{a:'center',s:13,w:600});
+    this.before.draw();this.after.draw();
+    ctx.strokeStyle='#2c5a60';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(290,240);ctx.lineTo(350,240);ctx.stroke();ctx.fillStyle='#2c5a60';ctx.beginPath();ctx.moveTo(352,240);ctx.lineTo(342,234);ctx.lineTo(342,246);ctx.fill();
+    label(TECH[this.tech].name.split('-')[0],320,228,{a:'center',s:10,w:600,c:'#2c5a60'});
+    const ci=this.ci;label(`Kejernihan ${BEFORE_CLAR[ci]}%`,190,376,{a:'center',s:12});label(`Garam: ${BEFORE_SALT[ci]}`,190,393,{a:'center',s:12});
+    label(`Kejernihan ${this.r.clarity}%`,450,376,{a:'center',s:12,w:600});label(`Garam: ${this.r.salt}`,450,393,{a:'center',s:12,w:600});}
+}
+
+/* ================= VIEW CONTROLLER ================= */
+const V={mode:'scene',sample:null,beam:false,tl:0,tlDur:0,tlSpeed:1,tlLabel:'',settled:false,obs:'',sim:null,result:null,t:0,stage:-1};
+function setScene(){const ci=S.cur;V.mode='scene';V.sample=preset(ci===2?'solutionCrystals':BEFORE[ci],SG);V.beam=false;V.tl=0;V.settled=false;V.obs=OBS[ci].rest;V.sim=null;V.result=null;$('#caption').hidden=true;}
+function startTimelapse(){const ci=S.cur;
+  if(ci===1&&V.settled){V.sample=preset('suspension',SG);V.settled=false;V.obs='Air diaduk kembali. Butiran tanah dan pasir kembali melayang.';renderControls();renderObs();return;}
+  if(ci===1){V.sample.settling=true;V.tlDur=V.tl=3.6;V.tlSpeed=2.2;V.tlLabel='+10 menit';}else{V.tlDur=V.tl=3;V.tlSpeed=3;V.tlLabel='+1 jam';}
+  V.obs='Waktu dipercepat…';renderControls();renderObs();}
+function endTimelapse(){const ci=S.cur;if(ci===1)V.settled=true;V.obs=OBS[ci].after;renderControls();renderObs();}
+
+let last=performance.now();
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;V.t+=dt;
+  if(V.mode==='scene'&&V.sample){let sp=1;if(V.tl>0){sp=V.tlSpeed;V.tl-=dt;if(V.tl<=0){V.tl=0;endTimelapse();}}
+    V.sample.update(dt,sp);drawScene(S.cur,V.t);if(V.beam)drawTorch(V.sample);V.sample.draw(V.beam);if(V.beam)drawExit(V.sample);
+    if(S.cur===2&&!V.sample.crystals.length)tag('Kadar garam: tinggi',SG.x-158,SG.y+8);
+    if(V.tl>0)drawClock(1-V.tl/V.tlDur,V.tlLabel);}
+  else if(V.mode==='sim'&&V.sim){V.sim.update(dt);V.sim.draw();updateCaption();if(V.sim.t>=V.sim.dur)finishSim();}
+  else if(V.mode==='result'&&V.result){V.result.update(dt);V.result.draw();}
+  requestAnimationFrame(frame);}
+
+function updateCaption(){const sim=V.sim;let idx=0;sim.stages.forEach((s,i)=>{if(sim.t>=s[0])idx=i;});const cap=$('#caption');
+  if(idx!==V.stage){V.stage=idx;cap.innerHTML=`<span class="tag">${esc(TECH[sim.tech].name)} · tahap ${idx+1}/${sim.stages.length}</span><span>${esc(sim.stages[idx][1])}</span><div class="bar"><i></i></div>`;}
+  const bar=cap.querySelector('.bar i');if(bar)bar.style.width=Math.min(100,sim.t/sim.dur*100)+'%';}
+
+function runSim(){const st=S.cases[S.cur];if(!st.tech||running)return;running=true;const C={filtrasi:FiltSim,koagulasi:CoagSim,distilasi:DistSim}[st.tech];
+  V.mode='sim';V.sim=new C(S.cur);V.stage=-1;V.beam=false;V.obs='Simulasi sedang berjalan. Perhatikan setiap tahapnya.';$('#caption').hidden=false;renderAll();}
+function finishSim(){const sim=V.sim,ci=sim.ci,tech=sim.tech,r=RESULTS[ci][tech],st=S.cases[ci];
+  st.history.push({tech,status:r.status,clarity:r.clarity,salt:r.salt});
+  V.mode='result';V.result=new ResultView(ci,tech);V.sim=null;running=false;$('#caption').hidden=true;
+  V.obs=`Hasil uji ${TECH[tech].name}: ${STATUS[r.status]}. Bandingkan gelas sebelum dan sesudah.`;save();renderAll();
+  if(matchMedia('(max-width:900px)').matches){const el=document.getElementById('result-card');if(el)el.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});}}
+
+/* ================= RENDER ================= */
+const CHECK='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function renderCases(){$('#cases').innerHTML=CASES.map((c,i)=>`<button class="case-btn${i===S.cur?' is-cur':''}" data-case="${i}" ${running?'disabled':''} aria-current="${i===S.cur}"><span class="swatch"><i style="background:${c.swatch}"></i></span><span class="case-txt"><b>${c.name}</b><small>${c.short}</small></span>${S.cases[i].saved?`<span class="done-mark" title="Selesai">${CHECK}</span>`:''}</button>`).join('');}
+function stepStates(st){const done=[st.mixOk,!!st.tech&&st.history.length>0,success(st),st.saved];const open=[true,st.mixOk,st.mixOk&&!!st.tech,success(st)];let active=done.indexOf(false);return{done,open,active};}
+function renderSteps(){const st=S.cases[S.cur],{done,active}=stepStates(st);const names=['Identifikasi','Pilih Teknologi','Uji Simulasi','Refleksi'];
+  $('#steps').innerHTML=names.map((n,i)=>`<li class="${done[i]?'done':i===active?'active':''}"><span>Langkah ${i+1}</span><b>${n}</b></li>`).join('');}
+function renderControls(){const el=$('#controls'),ci=S.cur;
+  if(V.mode==='scene'){const settle=ci===1?(V.settled?'Aduk Kembali':'Diamkan Sebentar'):'Diamkan 1 Jam';
+    el.innerHTML=`<button class="btn" data-act="settle" ${V.tl>0?'disabled':''}>${settle}</button><button class="btn" data-act="beam" aria-pressed="${V.beam}">Sorot Senter</button>`;}
+  else if(V.mode==='sim'){el.innerHTML=`<button class="btn" disabled>Simulasi berjalan…</button>`;}
+  else{el.innerHTML=`<button class="btn" data-act="back">Kembali ke Pengamatan</button>`;}}
+function renderObs(){$('#obs').innerHTML=`<span>Catatan pengamatan</span>${esc(V.obs)}`;}
+function meter(label,val,cls,note){return`<div class="meter"><div class="meter-top"><span>${label}</span><b>${val}%</b></div><div class="track"><i class="${cls}" style="width:${val}%"></i></div>${note?`<small>${note}</small>`:''}</div>`;}
+function renderSheet(){
+  const ci=S.cur,c=CASES[ci],st=S.cases[ci],{done,open,active}=stepStates(st);const fb=MIX_FB[ci];
+  const stepCls=i=>`step${done[i]?' is-done':''}${i===active?' is-active':''}${!open[i]?' is-locked':''}`;
+  const stateTxt=i=>done[i]?'Selesai':!open[i]?'Terkunci':'Dikerjakan';
+  const head=(i,t)=>`<div class="step-h"><span class="num">${done[i]?CHECK:i+1}</span><h3>${t}</h3><span class="state">${stateTxt(i)}</span></div>`;
+  let h=`<div class="case-head"><span class="kicker">Kasus ${ci+1} dari 3</span><h2>${c.name}</h2><p>${c.desc}</p></div>`;
+  // 1
+  h+=`<div class="${stepCls(0)}">${head(0,'Identifikasi campuran')}<p class="q">Berdasarkan cirinya, jenis campuran yang paling sesuai adalah...</p><div class="opts">`;
+  h+=MIX_ORDER.map((k,i)=>{const isOk=st.mixOk&&k===c.answer,isBad=!st.mixOk&&st.mixAns===k;return`<button class="opt${isOk?' is-ok':''}${isBad?' is-bad':''}" data-mix="${k}" ${st.mixOk||running?'disabled':''}><span class="l">${'ABC'[i]}</span>${MIX[k]}</button>`;}).join('')+'</div>';
+  if(st.mixOk)h+=`<div class="fb fb-ok" aria-live="polite"><b>Tepat!</b>${fb.ok}</div>`;
+  else if(st.mixAns)h+=`<div class="fb fb-bad" aria-live="polite"><b>Belum tepat, coba lagi.</b>${fb[st.mixAns]}</div>`;
+  else h+=`<p class="hint">Gunakan tombol di bawah gambar untuk mengamati sampel sebelum menjawab.</p>`;
+  h+='</div>';
+  // 2
+  h+=`<div class="${stepCls(1)}" id="step2">${head(1,'Pilih teknologi')}`;
+  if(!open[1])h+=`<p class="lockmsg">Terbuka setelah jenis campuran dijawab dengan benar.</p>`;
+  else{h+=`<p class="q">Teknologi yang dapat digunakan untuk membantu memisahkan/menjernihkan campuran tersebut adalah...</p><div class="techs">`+
+    TECH_ORDER.map((k,i)=>`<button class="tech${st.tech===k?' is-sel':''}" data-tech="${k}" aria-pressed="${st.tech===k}" ${running?'disabled':''}>${ICON[k]}<b>${'ABC'[i]}. ${TECH[k].name}</b><small>${TECH[k].sub}</small></button>`).join('')+
+    `</div><p class="hint">Kamu boleh memilih teknologi apa pun. Tepat atau tidaknya akan dibuktikan lewat simulasi.</p>`;}
+  h+='</div>';
+  // 3
+  h+=`<div class="${stepCls(2)}">${head(2,'Hasil uji pilihan teknologi')}`;
+  if(!open[2])h+=`<p class="lockmsg">Pilih teknologi terlebih dahulu untuk menjalankan simulasi.</p>`;
+  else{h+=`<div class="runrow"><button class="btn btn-primary btn-big" data-act="run" ${running?'disabled':''}>${running?'Simulasi berjalan…':'Jalankan Simulasi'}</button><small>Teknologi diuji: <b>${TECH[st.tech].name}</b></small></div>`;}
+  if(st.history.length){const last=st.history[st.history.length-1],r=RESULTS[ci][last.tech];
+    h+=`<div class="result ${r.status}" id="result-card"><div class="result-h"><b>Hasil uji: ${TECH[last.tech].name}</b><span class="pill ${r.status}">${STATUS[r.status]}</span></div><p class="why">${r.why}</p><div class="meters">`+
+      meter('Kejernihan',r.clarity,r.status,`Sebelum: ${BEFORE_CLAR[ci]}%`)+
+      `<div class="meter"><div class="meter-top"><span>Kadar garam</span><b>${r.salt}</b></div><div class="seg">${['rendah','sedang','tinggi'].map(x=>`<span class="${x===r.salt?'on':''}">${x}</span>`).join('')}</div><small>Sebelum: ${BEFORE_SALT[ci]}</small></div>`+
+      meter('Efisiensi',r.eff,'',EFF_LABEL[last.tech])+`</div>
+      <div class="actions"><button class="btn" data-act="retry" ${running?'disabled':''}>Coba Teknologi Lain</button></div></div>`;
+    h+=`<p class="tbl-title">Riwayat percobaan</p><div class="tablewrap"><table><thead><tr><th>#</th><th>Teknologi</th><th>Status</th><th>Kejernihan</th><th>Garam</th></tr></thead><tbody>`+
+      st.history.map((x,i)=>`<tr><td>${i+1}</td><td>${TECH[x.tech].name}</td><td><span class="pill ${x.status}">${STATUS[x.status]}</span></td><td>${x.clarity}%</td><td>${x.salt}</td></tr>`).join('')+`</tbody></table></div>`;}
+  h+='</div>';
+  // 4
+  h+=`<div class="${stepCls(3)}" id="step4">${head(3,'Refleksi')}`;
+  if(!open[3])h+=`<p class="lockmsg">Terbuka setelah ada simulasi berstatus <b>BERHASIL</b>.</p>`;
+  else{h+=`<p class="hint">Jawab dengan kalimatmu sendiri, minimal 15 kata per pertanyaan.</p><div class="refl">`+
+    REFL_Q.map((q,i)=>{const n=words(st.refl[i]);return`<label for="r${ci}-${i}">${i+1}. ${q}<textarea id="r${ci}-${i}" data-refl="${i}" rows="3">${esc(st.refl[i])}</textarea><span class="wc${n>=15?' ok':''}" id="wc${i}">${n}/15 kata</span></label>`;}).join('')+
+    `</div><div class="actions"><button class="btn btn-primary" data-act="savere" id="savere" ${st.refl.every(x=>words(x)>=15)?'':'disabled'}>${st.saved?'Perbarui Refleksi':'Simpan Refleksi'}</button>${st.saved?'<span class="muted">Refleksi tersimpan.</span>':''}</div>`;
+    if(st.saved){h+=`<div class="points"><h4>Poin penting</h4><ul><li>Metode pemisahan harus disesuaikan dengan ukuran partikel dan sifat campuran.</li><li>Satu metode sering tidak cukup. Pengolahan air nyata menggabungkan beberapa tahap: koagulasi, pengendapan, filtrasi, lalu disinfeksi.</li><li>Makin kecil partikel, makin sulit disaring. Zat yang terlarut hanya bisa dipisahkan dengan cara yang mengubah wujud, seperti penguapan atau distilasi.</li></ul><p>Bandingkan dengan jawabanmu. Ini pembanding, bukan kunci jawaban mutlak.</p></div>`;
+      const next=S.cases.findIndex(x=>!x.saved);h+=`<div class="actions">${next>=0?`<button class="btn btn-primary" data-case="${next}">Lanjut ke ${CASES[next].name}</button>`:`<button class="btn btn-primary" data-act="torecap">Lihat Rekap Hasil</button>`}</div>`;}}
+  h+='</div>';
+  $('#sheet').innerHTML=h;}
+let resetAsk=false,copyFallback=false;
+function recapText(){const lines=[`REKAP LAB VIRTUAL: MENJERNIHKAN AIR SUNGAI`,`Nama: ${S.name||'-'}`,''];
+  CASES.forEach((c,i)=>{const st=S.cases[i],ok=st.history.find(h=>h.status==='ok');lines.push(`${c.name}`,`  Jenis campuran: ${st.mixOk?MIX[c.answer]:'-'}`,`  Teknologi berhasil: ${ok?TECH[ok.tech].name:'-'}`,`  Riwayat: ${st.history.map(h=>`${TECH[h.tech].name} (${STATUS[h.status]}, ${h.clarity}%)`).join('; ')||'-'}`);
+    REFL_Q.forEach((q,j)=>lines.push(`  ${j+1}. ${q}`,`     ${st.refl[j].trim()||'-'}`));lines.push('');});return lines.join('\n');}
+function renderRecap(){const all=S.cases.every(x=>x.saved);
+  let h=`<div><h2>Rekap Hasil</h2><p class="recap-sub">${S.name?`Nama siswa: <b>${esc(S.name)}</b>. `:'Isi nama siswa di bagian atas. '}${all?'Ketiga kasus sudah selesai. Salin rekap ini untuk dikirim ke guru.':'Rekap terisi otomatis. Selesaikan ketiga kasus untuk menyalin rekap.'}</p></div>`;
+  h+=`<div class="tablewrap"><table><thead><tr><th>Kasus</th><th>Jenis campuran</th><th>Teknologi berhasil</th><th>Riwayat percobaan</th></tr></thead><tbody>`+
+    CASES.map((c,i)=>{const st=S.cases[i],ok=st.history.find(x=>x.status==='ok');return`<tr><td><b>${c.name}</b></td><td>${st.mixOk?MIX[c.answer]:'<span class="muted">belum</span>'}</td><td>${ok?TECH[ok.tech].name:'<span class="muted">belum</span>'}</td><td>${st.history.length?'<ul>'+st.history.map(x=>`<li>${TECH[x.tech].name}: ${STATUS[x.status]} (${x.clarity}%)</li>`).join('')+'</ul>':'<span class="muted">belum ada</span>'}</td></tr>`;}).join('')+`</tbody></table></div>`;
+  const saved=S.cases.map((st,i)=>[st,i]).filter(([st])=>st.saved);
+  if(saved.length)h+=`<div class="rlist">`+saved.map(([st,i])=>`<div class="rcase"><h4>Refleksi · ${CASES[i].name}</h4><dl>${REFL_Q.map((q,j)=>`<dt>${j+1}. ${q}</dt><dd>${esc(st.refl[j])}</dd>`).join('')}</dl></div>`).join('')+`</div>`;
+  if(resetAsk)h+=`<div class="actions"><span>Hapus semua jawaban dan mulai lagi dari awal?</span><button class="btn btn-danger" data-act="resetyes">Ya, mulai lagi</button><button class="btn" data-act="resetno">Batal</button></div>`;
+  else h+=`<div class="actions"><button class="btn btn-primary" data-act="copy" ${all?'':'disabled'}>Salin Rekap</button><button class="btn" data-act="reset" ${running?'disabled':''}>Ulangi dari Awal</button><span class="muted" id="copymsg" aria-live="polite"></span></div>`;
+  if(copyFallback)h+=`<textarea class="copybox" id="copybox" readonly>${esc(recapText())}</textarea>`;
+  $('#recap').innerHTML=h;
+  if(copyFallback){const b=$('#copybox');b.focus();b.select();}}
+function renderAll(){renderCases();renderSteps();renderControls();renderObs();renderSheet();renderRecap();}
+
+/* ================= EVENTS ================= */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;const st=S.cases[S.cur];
+  if(b.dataset.case!==undefined){const i=+b.dataset.case;if(running)return;S.cur=i;setScene();save();renderAll();if(b.closest('#sheet'))window.scrollTo({top:0,behavior:RM?'auto':'smooth'});return;}
+  if(b.dataset.mix){const k=b.dataset.mix;st.mixAns=k;st.tries++;st.mixOk=k===CASES[S.cur].answer;save();renderAll();return;}
+  if(b.dataset.tech){st.tech=b.dataset.tech;save();renderAll();return;}
+  switch(b.dataset.act){
+    case 'settle':if(V.mode==='scene'&&V.tl<=0)startTimelapse();break;
+    case 'beam':V.beam=!V.beam;V.obs=V.beam?OBS[S.cur].beam:(V.settled?OBS[S.cur].after:OBS[S.cur].rest);renderControls();renderObs();break;
+    case 'back':setScene();renderAll();break;
+    case 'run':runSim();break;
+    case 'retry':st.tech=null;setScene();save();renderAll();document.getElementById('step2').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});break;
+    case 'savere':if(st.refl.every(x=>words(x)>=15)){st.saved=true;save();renderAll();document.getElementById('step4').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});}break;
+    case 'torecap':$('#recap').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});break;
+    case 'copy':{const txt=recapText();const msg=()=>document.getElementById('copymsg');
+      try{navigator.clipboard.writeText(txt).then(()=>{const m=msg();if(m)m.textContent='Rekap tersalin. Tempel di WhatsApp, email, atau Google Classroom.';},()=>{copyFallback=true;renderRecap();});}catch(err){copyFallback=true;renderRecap();}break;}
+    case 'reset':resetAsk=true;renderRecap();break;
+    case 'resetno':resetAsk=false;renderRecap();break;
+    case 'resetyes':resetAsk=false;copyFallback=false;S={name:'',cur:0,cases:[freshCase(),freshCase(),freshCase()]};$('#nama').value='';setScene();save();renderAll();window.scrollTo({top:0});break;
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='nama'){S.name=t.value;save();renderRecap();return;}
+  if(t.dataset.refl!==undefined){const st=S.cases[S.cur],i=+t.dataset.refl;st.refl[i]=t.value;const n=words(t.value),wc=document.getElementById('wc'+i);if(wc){wc.textContent=n+'/15 kata';wc.classList.toggle('ok',n>=15);}
+    const sb=document.getElementById('savere');if(sb)sb.disabled=!st.refl.every(x=>words(x)>=15);save();}
+});
+
+/* ================= START ================= */
+$('#nama').value=S.name||'';
+setScene();renderAll();fit();requestAnimationFrame(frame);
+</script>
+
+</body></html>
